@@ -9,11 +9,11 @@
     color: blue;
 }
 
-.register-container input {
+.register-container input:not([type=checkbox]) {
     display: block;
     width: 100%;
     margin-bottom: 15px;
-    height: 50px;
+    height: 60px;
     font-size: 20px;
     margin-left: 15px;
 }
