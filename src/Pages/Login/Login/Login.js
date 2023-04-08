@@ -3,7 +3,11 @@ import { Button, Form } from 'react-bootstrap';
 import { useSendPasswordResetEmail, useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import auth from '../../../firebase.init';
+import Loading from '../../Shared/Loading/Loading';
 import SocialLogin from '../SocialLogin/SocialLogin';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import PageTitle from '../../Shared/PageTitle/PageTitle';
 
 const Login = () => {
     const emailRef = useRef('');
@@ -21,6 +25,9 @@ const Login = () => {
         loading,
         error,
     ] = useSignInWithEmailAndPassword(auth);
+    if (loading || sending) {
+        return <Loading></Loading>
+    }
     if (error) {
         errorElement = <p className='text-danger'>Error: {error?.message} </p>
     }
@@ -39,18 +46,20 @@ const Login = () => {
     if (user) {
         navigate(from, { replace: true });
     }
-    const handleResetPassword = async () => {
+    const rsetPassword = async () => {
         const email = emailRef.current.value;
-        const success = await sendPasswordResetEmail(
-            email,
-        );
-        if (success) {
-            alert('Sent email');
+        if (email) {
+            await sendPasswordResetEmail(email);
+            toast('set email');
         }
-
+        else {
+            toast('please enter your email address');
+        }
     }
+
     return (
         <div className='container w-50 mx-auto'>
+            <PageTitle title='Login'></PageTitle>
             <h2 className='text-primary text-center mt-5'>Please Login Now</h2>
             <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb
@@ -75,8 +84,9 @@ const Login = () => {
             </Form>
             {errorElement}
             <p>New to Genius Car? <Link to={'/register'} className='text-danger' onClick={navigateRegister}> Please Register Now</Link></p>
-            <p>New to Genius Car? <Link to={'/register'} className='text-danger' onClick={handleResetPassword}> Forget Password</Link></p>
+            <p>Forget password <button className='btn btn-link text-danger' onClick={rsetPassword}> Forget Password</button></p>
             <SocialLogin></SocialLogin>
+            <ToastContainer />
         </div>
     );
 };
